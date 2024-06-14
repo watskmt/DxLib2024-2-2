@@ -4,6 +4,8 @@
 #include "framework.h"
 #include "DxLib2024-2-2.h"
 
+#include <string>
+
 #define MAX_LOADSTRING 100
 
 // グローバル変数:
@@ -184,7 +186,9 @@ INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
-    unsigned int Cr;
+    unsigned int Cr, Cw, C;
+    int mouseX, mouseY;
+    int mouseInput;
 
     if (DxLib_Init() == -1)            // ＤＸライブラリ初期化処理
     {
@@ -196,8 +200,32 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     SetMouseDispFlag(TRUE);
 
     Cr = GetColor(0, 0, 255);        // 青色の値を取得
-
-    DrawBox(100, 100, 120, 120, Cr, TRUE);    // 四角形を描画
+    Cw = GetColor(255, 255, 255);        // 青色の値を取得
+    C = Cr;
+    while (1)
+    {
+        mouseInput = GetMouseInput();
+        GetMousePoint(&mouseX, &mouseY);
+    	if (mouseInput & MOUSE_INPUT_MIDDLE)
+            break;
+        if (CheckHitKey(KEY_INPUT_1))
+            C = GetColor(255, 0, 0);
+        if (CheckHitKey(KEY_INPUT_2))
+            C = GetColor(0, 255, 0);
+        if (CheckHitKey(KEY_INPUT_3))
+            C = GetColor(0, 0, 255);
+        if (CheckHitKey(KEY_INPUT_4))
+            C = GetColor(255, 255, 255);
+        if (mouseInput & MOUSE_INPUT_RIGHT)
+            DrawBox(mouseX, mouseY, mouseX + 20, mouseY + 20
+                    , 0, TRUE);    // 四角形で黒を塗る
+    	else if (mouseInput & MOUSE_INPUT_LEFT)
+            DrawBox(mouseX, mouseY, mouseX+20, mouseY+20
+                , C, TRUE);    // 四角形を描画
+        if (CheckHitKey(KEY_INPUT_DELETE))
+            ClearDrawScreen();
+    	ProcessMessage();
+    }
 
     WaitKey();                // キーの入力待ち(『WaitKey』を使用)
 
